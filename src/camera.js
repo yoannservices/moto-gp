@@ -2,7 +2,7 @@
 (function () {
   const A = (globalThis.MGP = globalThis.MGP || {});
   const T = THREE, clamp = A.clamp;
-  const UP = new T.Vector3(0, 1, 0), FWD = new T.Vector3(0, 0, 1), FLIP = new T.Quaternion().setFromAxisAngle(UP, Math.PI);
+  const UP = new T.Vector3(0, 1, 0), FWD = new T.Vector3(0, 0, 1), RIGHT = new T.Vector3(1, 0, 0), FLIP = new T.Quaternion().setFromAxisAngle(UP, Math.PI);
   const NAMES = { chase: 'Poursuite', cockpit: 'Cockpit', tcam: 'T-cam', tv: 'TV' };
 
   A.CameraRig = class CameraRig {
@@ -57,6 +57,8 @@
         this.q.setFromAxisAngle(UP, c.h).multiply(this.q3.setFromAxisAngle(FWD, -c.lean * (mode === 'cockpit' ? 0.7 : 0.35)));
         this.q2.setFromAxisAngle(UP, (look ? 0 : Math.PI));
         cam.position.copy(p); cam.quaternion.copy(this.q).multiply(this.q2);
+        // cockpit : regard vers le bas pour voir la bulle et le tableau de bord
+        if (mode === 'cockpit' && !look) cam.quaternion.multiply(this.q3.setFromAxisAngle(RIGHT, -0.2));
         this._fov(mode === 'cockpit' ? 78 : 84, dt);
       } else { // TV
         const sp_ = this._spots(tr), L = tr.L, rel = s => ((s % L) + L * 1.5) % L - L / 2;
